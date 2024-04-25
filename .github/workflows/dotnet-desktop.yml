@@ -1,0 +1,58 @@
+name: .NET Core Desktop
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Create the app package
+      run: dotnet publish HyperSploit.sln -c Release -r win-x64
+    - uses: actions/upload-artifact@v4
+      with:
+        name: HyperSploit-Windows
+        path: bin/Release/net8.0/win-x64/publish/
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Create the app package
+      run: dotnet publish HyperSploit.sln -c Release -r linux-x64
+    - uses: actions/upload-artifact@v4
+      with:
+        name: HyperSploit-Linux
+        path: bin/Release/net8.0/linux-x64/publish/
+  build-macos:
+    runs-on: macos-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Create the app package
+      run: dotnet publish HyperSploit.sln -c Release -r osx-x64
+    - uses: actions/upload-artifact@v4
+      with:
+        name: HyperSploit-MacOS
+        path: bin/Release/net8.0/osx-x64/publish/
