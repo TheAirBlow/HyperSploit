@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <PublishAot>true</PublishAot>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="AdvancedSharpAdbClient" Version="3.3.12" />
+      <PackageReference Include="Spectre.Console" Version="0.49.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource
+                Include="Assets/Settings.apk.gz"
+                LogicalName="Settings.apk.gz"/>
+        <EmbeddedResource
+                Include="Assets/adb-linux/**/*"
+                Condition="$([MSBuild]::IsOSPlatform('Linux'))" 
+                LogicalName="$([System.String]::Copy('%(RelativeDir)').Replace('\','/'))%(Filename)%(Extension)"/>
+        <EmbeddedResource
+                Include="Assets/adb-windows/**/*"
+                Condition="$([MSBuild]::IsOSPlatform('Windows'))"
+                LogicalName="$([System.String]::Copy('%(RelativeDir)').Replace('\','/'))%(Filename)%(Extension)"/>
+        <EmbeddedResource
+                Include="Assets/adb-macos/**/*"
+                Condition="$([MSBuild]::IsOSPlatform('macOS'))"
+                LogicalName="$([System.String]::Copy('%(RelativeDir)').Replace('\','/'))%(Filename)%(Extension)"/>
+    </ItemGroup>
+</Project>

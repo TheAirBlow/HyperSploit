@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HyperSploit", "HyperSploit.csproj", "{5E21E3FC-8182-4A04-A86E-D9796F28622A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5E21E3FC-8182-4A04-A86E-D9796F28622A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E21E3FC-8182-4A04-A86E-D9796F28622A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E21E3FC-8182-4A04-A86E-D9796F28622A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E21E3FC-8182-4A04-A86E-D9796F28622A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
