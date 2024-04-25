@@ -6,53 +6,44 @@ on:
 
 jobs:
   build-windows:
+    name: Windows Build
     runs-on: windows-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: Install .NET Core
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
-    - name: Create the app package
+    - name: Build HyperSploit
       run: dotnet publish HyperSploit.sln -c Release -r win-x64
     - uses: actions/upload-artifact@v4
       with:
-        name: HyperSploit-Windows
-        path: bin/Release/net8.0/win-x64/publish/
+        name: HyperSploit-Windows.exe
+        path: bin/Release/net8.0/win-x64/publish/HyperSploit.exe
   build-linux:
+    name: Linux Build
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: Install .NET Core
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
-    - name: Create the app package
+    - name: Build HyperSploit
       run: dotnet publish HyperSploit.sln -c Release -r linux-x64
     - uses: actions/upload-artifact@v4
       with:
         name: HyperSploit-Linux
-        path: bin/Release/net8.0/linux-x64/publish/
+        path: bin/Release/net8.0/linux-x64/publish/HyperSploit
   build-macos:
+    name: MacOS Build
     runs-on: macos-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: Install .NET Core
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
-    - name: Create the app package
+    - name: Build HyperSploit
       run: dotnet publish HyperSploit.sln -c Release -r osx-x64
     - uses: actions/upload-artifact@v4
       with:
         name: HyperSploit-MacOS
-        path: bin/Release/net8.0/osx-x64/publish/
+        path: bin/Release/net8.0/osx-x64/publish/HyperSploit
