@@ -1,10 +1,10 @@
 # HyperSploit
-This is a simple zero depedencies utility to bypass HyperOS restrictions on bootloader unlocking. \
-Thanks to developers of [Xiaomi-HyperOS-BootLoader-Bypass](https://github.com/MlgmXyysd/Xiaomi-HyperOS-BootLoader-Bypass) for most of the reverse-engineering work!
+This is a simple zero depedencies utility to bypass HyperOS restrictions on bootloader unlocking.
 
 ## Why another tool?
 1) This tool is much more user-friendly, is a single file and has zero dependencies
 2) HyperSploit ships with an older version of Settings to rollback in case you have a patched version
+3) This repo is licenced under an open-source licence instead of all rights reserved.
 
 ## Disclaimer
 Unlocking the bootloader is your responsibility. \
@@ -46,3 +46,6 @@ Note: If you're on MacOS or on Linux, install ADB and add it to `PATH`.
 
 ## Licence
 This project is licenced under [Mozilla Public License Version 2.0](https://github.com/TheAirBlow/HyperSploit/blob/main/LICENCE)
+
+## Credits
+- [MlgmXyysd](https://github.com/MlgmXyysd) for making [Xiaomi-HyperOS-BootLoader-Bypass](https://github.com/MlgmXyysd/Xiaomi-HyperOS-BootLoader-Bypass) on which this tool is largely based on
