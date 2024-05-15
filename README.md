@@ -33,6 +33,13 @@ Note: Each account can only unlock 1 phone per month and 3 phones per year.
    1. Do not eject the SIM card as the phone will constantly contact Xiaomi's servers.
    2. Do not bind the account to another device or re-bind the same one.
 
+## Error trying to downgrade the settings app
+If you get `Failure [INSTALL_FAILED_USER_RESTRICTED: Install canceled by user]` at this stage, make sure to do the following in developer options:
+1) Enable `Install via USB`
+2) Enable `USB debugging (Security Settings)`
+3) Near the end of the page, tap `Reset to default values` 5 times
+4) After more options appear, disable `Turn on system optimization` (if it still fails, you may need to reboot)
+
 ## How to use
 Note: If you're on MacOS or on Linux, install ADB and add it to `PATH`.
 1) Download latest binary from [Releases](https://github.com/TheAirBlow/HyperFuck/releases) for your OS
