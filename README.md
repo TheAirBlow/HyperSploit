@@ -42,7 +42,7 @@ If you get `Failure [INSTALL_FAILED_USER_RESTRICTED: Install canceled by user]` 
 
 ## How to use
 Note: If you're on MacOS or on Linux, install ADB and add it to `PATH`.
-1) Download latest binary from [Releases](https://github.com/TheAirBlow/HyperFuck/releases) for your OS
+1) Download latest binary from [Releases](https://github.com/TheAirBlow/HyperSploit/releases) for your OS
 2) Connect your Xiaomi device and run the executable
 
 ## FAQ
