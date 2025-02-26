@@ -15,7 +15,9 @@ By using this tool you acknowledge that:
 4) Warranty *may* be voided
 
 ## Requirements
-Note: Each account can only unlock 1 phone per month and 3 phones per year.
+> [!NOTE]
+>
+> Each account can only unlock 1 phone per year.
 1) Xiaomi must not have forced your account or device to go through qualification
 2) A valid SIM-card must be inserted with access to the internet
 3) You're running an official version of HyperOS
