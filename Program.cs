@@ -32,7 +32,7 @@ public static class Program {
     /// <param name="args">Arguments</param>
     public static async Task Main(string[] args) {
         AnsiConsole.Write(new FigletText("HyperSploit").LeftJustified().Color(Color.Cyan1));
-        AnsiConsole.MarkupLine("[green]Welcome to HyperSploit v1.0 by TheAirBlow![/]");
+        AnsiConsole.MarkupLine("[green]Welcome to HyperSploit v1.1 by TheAirBlow![/]");
         var root = Extract();
         if (!AdbServer.Instance.GetStatus().IsRunning) {
             AnsiConsole.MarkupLine("[yellow]No ADB server is running, trying to start...[/]");
@@ -83,9 +83,18 @@ public static class Program {
     /// <param name="client">ADB client</param>
     /// <param name="device">Device data</param>
     private static async Task Bypass(AdbClient client, DeviceData device) {
+        var tablet = await IsTablet(client, device);
+        AnsiConsole.MarkupLine(tablet 
+            ? "[yellow]Make sure you have a Wi-Fi connection with internet access![/]"
+            : "[yellow]Make sure you have a cellular connection with internet access![/]");
+        if (tablet) {
+            await client.ExecuteRemoteCommandAsync("svc wifi enable", device);
+        } else {
+            await client.ExecuteRemoteCommandAsync("svc wifi disable", device);
+            await client.ExecuteRemoteCommandAsync("svc data enable", device);
+        }
+        
         AnsiConsole.MarkupLine("[green]Open Mi Unlock Status and attempt to bind account[/]");
-        await client.ExecuteRemoteCommandAsync("svc wifi disable", device);
-        await client.ExecuteRemoteCommandAsync("svc data enable", device);
         await client.ExecuteRemoteCommandAsync("am start -a android.settings.APPLICATION_DEVELOPMENT_SETTINGS", device);
 
         var receiver = new EventOutputReceiver();
@@ -95,7 +104,7 @@ public static class Program {
             var match = Regex.Match(line, "args: (.*)");
             if (match.Success) {
                 AnsiConsole.MarkupLine("[green]Disabling mobile internet, taking over![/]");
-                client.ExecuteRemoteCommand("svc data disable", device);
+                client.ExecuteRemoteCommand(tablet ? "svc wifi disable" : "svc data disable", device);
                 arguments = Decrypt(match.Groups[1].Value);
                 return;
             }
@@ -109,7 +118,7 @@ public static class Program {
         
         await client.ExecuteRemoteCommandAsync("logcat -T 1 *:S CloudDeviceStatus:V", device, receiver);
         if (arguments == null || headers == null) {
-            await client.ExecuteRemoteCommandAsync("svc data enable", device);
+            await client.ExecuteRemoteCommandAsync(tablet ? "svc wifi enable" : "svc data enable", device);
             AnsiConsole.MarkupLine("[red]Failed to decrypt arguments and headers![/]");
             AnsiConsole.MarkupLine("[yellow]This probably means you have a patched Settings app.[/]");
             if (AnsiConsole.Confirm("[yellow]Try downgrading to an unpatched version?[/]", false))
@@ -118,13 +127,49 @@ public static class Program {
         }
 
         AnsiConsole.MarkupLine("[green]Successfully decrypted arguments and headers![/]");
-        arguments = arguments.Replace("V816", "V14");
+        #if DEBUG
+        Console.WriteLine($"Headers: {headers}");
+        Console.WriteLine($"Arguments: {arguments}");
+        #endif
         
+        AnsiConsole.MarkupLine("[cyan]Sending account bind request impersonating MIUI 10...[/]");
+        #if DEBUG
+        arguments = AnsiConsole.Ask<string>("[yellow]Modified arguments:[/] ");
+        #else
+        arguments = arguments.Replace("V816", "V10");
+        #endif
+        await SendRequest(headers, arguments);
+        
+        await client.ExecuteRemoteCommandAsync(tablet ? "svc wifi enable" : "svc data enable", device);
+    }
+
+    /// <summary>
+    /// Checks if the target device is a tablet
+    /// </summary>
+    /// <param name="client">ADB client</param>
+    /// <param name="device">Device data</param>
+    /// <returns>True if tablet</returns>
+    private static async Task<bool> IsTablet(AdbClient client, DeviceData device) {
+        var tablet = true;
+        var receiver = new EventOutputReceiver();
+        receiver.OnOutput += (_, line) => {
+            if (line == "feature:android.hardware.telephony") tablet = false;
+        };
+        
+        await client.ExecuteRemoteCommandAsync("pm list features", device, receiver);
+        return tablet;
+    }
+
+    /// <summary>
+    /// Sends an account binding request
+    /// </summary>
+    /// <param name="headers">Headers</param>
+    /// <param name="arguments">Arguments</param>
+    private static async Task SendRequest(string headers, string arguments) {
         const string signKey = "10f29ff413c89c8de02349cb3eb9a5f510f29ff413c89c8de02349cb3eb9a5f5";
         var toSign = $"POST\n/v1/unlock/applyBind\ndata={arguments}&sid=miui_sec_android";
         var signature = Convert.ToHexString(HMACSHA1.HashData(Encoding.ASCII.GetBytes(signKey), Encoding.UTF8.GetBytes(toSign)));
         
-        AnsiConsole.MarkupLine("[cyan]Sending account bind request impersonating MIUI 14...[/]");
         var cookies = new CookieContainer();
         using var http = new HttpClient(new HttpClientHandler {
             CookieContainer = cookies
@@ -142,7 +187,11 @@ public static class Program {
                 ["sid"] = "miui_sec_android",
                 ["sign"] = signature
             }));
-        var json = JsonSerializer.Deserialize(await resp.Content.ReadAsStringAsync(),
+        var text = await resp.Content.ReadAsStringAsync();
+        #if DEBUG
+        Console.WriteLine($"Response: {text}");
+        #endif
+        var json = JsonSerializer.Deserialize(text,
             SourceGenerationContext.Default.JsonResponse)!;
         
         AnsiConsole.MarkupLine(json.Code switch {
@@ -154,8 +203,6 @@ public static class Program {
             86015 => "[red]Error 86015: Invalid device signature[/]",
             _ => $"[red]Error {json.Code}: {json.Description}[/]"
         });
-        
-        await client.ExecuteRemoteCommandAsync("svc data enable", device);
     }
 
     /// <summary>
