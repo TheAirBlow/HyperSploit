@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using AdvancedSharpAdbClient;
+using AdvancedSharpAdbClient.Exceptions;
 using AdvancedSharpAdbClient.Models;
 using Spectre.Console;
 
@@ -210,7 +211,8 @@ public static class Program {
     /// </summary>
     /// <param name="client">ADB client</param>
     /// <param name="device">Device data</param>
-    private static async Task Downgrade(AdbClient client, DeviceData device) {
+    /// <param name="nuclear">Nuclear option</param>
+    private static async Task Downgrade(AdbClient client, DeviceData device, bool nuclear = false) {
         AnsiConsole.MarkupLine("[green]Decompressing Settings.apk bundled within HyperSploit...[/]");
         await using var apk = typeof(Program).Assembly
             .GetManifestResourceStream("Settings.apk.gz")!;
@@ -219,12 +221,35 @@ public static class Program {
         using var memory = new MemoryStream();
         await stream.CopyToAsync(memory);
         memory.Position = 0;
+
+        if (nuclear) {
+            AnsiConsole.MarkupLine("[green]Uninstalling the Settings app...[/]");
+            await client.ExecuteRemoteCommandAsync("pm uninstall --user 0 com.android.settings", device);
+        }
         
         AnsiConsole.MarkupLine("[green]Installing unpatched Settings APK to the device...[/]");
-        await client.InstallAsync(device, memory);
+        try {
+            await client.InstallAsync(device, memory);
+        } catch (AdbException e) {
+            // ReSharper disable once InvertIf ~ can you please stop nagging me
+            if (e.Message.Contains("INSTALL_FAILED_VERSION_DOWNGRADE") || e.Message.Contains("INSTALL_FAILED_INVALID_APK")) {
+                AnsiConsole.MarkupLine(nuclear 
+                    ? "[red]Unfortunately, you're out of luck.[/] [yellow]You have a patched HyperOS version.[/]"
+                    : "[yellow]Downgrade failed, but you can still try out the nuclear option (it will auto restore)[/]");
+                if (!nuclear && AnsiConsole.Confirm("[yellow]Try deleting the Settings app altogether?[/]", false))
+                    await Downgrade(client, device, true);
+                
+                if (nuclear) {
+                    AnsiConsole.MarkupLine("[green]Restoring the original Settings app...[/]");
+                    await client.ExecuteRemoteCommandAsync("cmd package install-existing com.android.settings", device);
+                }
+                return;
+            }
+
+            throw;
+        }
 
         AnsiConsole.MarkupLine("[green]Installation finished, trying the bypass again...[/]");
-        AnsiConsole.MarkupLine("[yellow]Note: It's unknown whether it succeeded or not![/]");
         await Bypass(client, device);
     }
     
