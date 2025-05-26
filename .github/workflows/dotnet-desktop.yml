@@ -18,7 +18,7 @@ jobs:
     - uses: actions/upload-artifact@v4
       with:
         name: HyperSploit-Windows.exe
-        path: bin/Release/net8.0/win-x64/publish/HyperSploit.exe
+        path: bin/Release/net9.0/win-x64/publish/HyperSploit.exe
   build-linux:
     name: Linux Build
     runs-on: ubuntu-latest
@@ -32,7 +32,7 @@ jobs:
     - uses: actions/upload-artifact@v4
       with:
         name: HyperSploit-Linux
-        path: bin/Release/net8.0/linux-x64/publish/HyperSploit
+        path: bin/Release/net9.0/linux-x64/publish/HyperSploit
   build-macos:
     name: MacOS Build
     runs-on: macos-latest
@@ -46,4 +46,4 @@ jobs:
     - uses: actions/upload-artifact@v4
       with:
         name: HyperSploit-MacOS
-        path: bin/Release/net8.0/osx-x64/publish/HyperSploit
+        path: bin/Release/net9.0/osx-x64/publish/HyperSploit
